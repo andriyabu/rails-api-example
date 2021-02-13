@@ -2,9 +2,12 @@ require 'rails_helper'
 
 describe 'Books API', type: :request do
   describe 'GET /books' do
-    it 'returns all books' do
+    before do
       FactoryBot.create(:book, title: 'Cook Book', author:'Andri Yabu')
       FactoryBot.create(:book, title: 'Baristha Book', author:'Andri Yabu')
+    end
+    
+    it 'returns all books' do
       get '/api/v1/books'
 
       expect(response).to have_http_status(:success)
@@ -23,9 +26,12 @@ describe 'Books API', type: :request do
   end
 
   describe 'DELETE /books/:id' do
-    let(:book) {FactoryBot.create(:book, title: 'Cook Book', author:'Andri Yabu')}
+    let!(:book) {FactoryBot.create(:book, title: 'Cook Book', author:'Andri Yabu')}
     it 'deletes a book' do
-      delete "/api/v1/books/#{book.id}"
+      expect {
+          delete "/api/v1/books/#{book.id}"
+      }.to change { Book.count }.from(1).to(0)
+
 
       expect(response).to have_http_status(:no_content)
     end
